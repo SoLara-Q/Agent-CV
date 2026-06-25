@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ai-interview-platform
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/ai_interview?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+
+  sql:
+    init:
+      mode: never
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      timeout: 800ms
+
+  thymeleaf:
+    cache: false
+
+  h2:
+    console:
+      enabled: false
+      path: /h2-console
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+app:
+  upload-dir: uploads
+  cache:
+    use-redis: true
+  ai:
+    use-ollama: true
+    ollama-url: http://127.0.0.1:11434/api/generate
+    model: qwen2.5:1.5b

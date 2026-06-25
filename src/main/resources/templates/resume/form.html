@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>简历表单</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="bg-decoration">
+    <div class="floating-icon">📄</div>
+    <div class="floating-icon">💼</div>
+    <div class="floating-icon">🎯</div>
+    <div class="floating-icon">✨</div>
+    <div class="floating-icon">🚀</div>
+</div>
+
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+    <div class="card">
+        <h3 class="card-title" th:text="${resume.id == null ? '新增简历' : '编辑简历'}"></h3>
+        <form th:action="@{/resumes/save}" method="post" enctype="multipart/form-data" th:object="${resume}">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{userId}">
+            <div class="form-row">
+                <label>姓名</label>
+                <input th:field="*{realName}" placeholder="请输入姓名" required>
+            </div>
+            <div class="form-row">
+                <label>目标岗位</label>
+                <input th:field="*{targetJob}" placeholder="如：Java后端开发实习生" required>
+            </div>
+            <div class="form-row">
+                <label>核心技能</label>
+                <div style="width: 100%;">
+                    <textarea th:field="*{skills}" placeholder="如：Java、Spring Boot、MyBatis-Plus、MySQL、Redis"></textarea>
+                    <div style="margin-top: 10px;">
+                        <button class="btn green" type="button" onclick="generateCoreSkills()">AI生成核心技能</button>
+                        <span id="skillGenerateTip" class="tip">根据目标岗位和项目经历自动生成，可生成后再手动修改。</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>项目经历</label>
+                <textarea th:field="*{projectExperience}" placeholder="请输入项目经历，建议使用 STAR 法描述"></textarea>
+            </div>
+            <div class="form-row">
+                <label>上传简历 docx</label>
+                <div>
+                    <input type="file" name="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <p class="tip">支持上传 .docx 格式 Word 简历；保存后系统会自动提取 Word 文本，用于 AI 简历分析。</p>
+                    <p th:if="${resume.filePath != null}">已上传：<a th:href="${resume.filePath}" target="_blank" th:text="${resume.filePath}"></a></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>AI优化建议</label>
+                <pre class="ai" th:text="${resume.aiSuggest == null ? '点击下方“保存后AI分析”或列表中的“AI分析”按钮生成建议。' : resume.aiSuggest}"></pre>
+            </div>
+            <button class="btn" type="submit">保存</button>
+            <a class="btn green" th:if="${resume.id != null}" th:href="@{/resumes/analyze/{id}(id=${resume.id})}">保存后AI分析</a>
+            <a class="btn gray" th:href="@{/resumes}">返回</a>
+        </form>
+    </div>
+</div>
+<script th:inline="javascript">
+    const generateSkillsUrl = /*[[@{/resumes/generate-skills}]]*/ "/resumes/generate-skills";
+
+    function getInputValue(id) {
+        const el = document.getElementById(id);
+        return el ? el.value : "";
+    }
+
+    async function generateCoreSkills() {
+        const tip = document.getElementById("skillGenerateTip");
+        const skillsTextarea = document.getElementById("skills");
+
+        if (!skillsTextarea) {
+            alert("没有找到核心技能输入框");
+            return;
+        }
+
+        const targetJob = getInputValue("targetJob");
+        const projectExperience = getInputValue("projectExperience");
+
+        if (!targetJob && !projectExperience) {
+            alert("请先填写目标岗位或项目经历，再生成核心技能");
+            return;
+        }
+
+        tip.innerText = "AI正在生成核心技能，请稍等...";
+        tip.style.color = "#2563eb";
+
+        try {
+            const response = await fetch(generateSkillsUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: getInputValue("id"),
+                    realName: getInputValue("realName"),
+                    targetJob: targetJob,
+                    skills: getInputValue("skills"),
+                    projectExperience: projectExperience
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                skillsTextarea.value = data.skills;
+                tip.innerText = "核心技能已生成，可继续手动修改后保存。";
+                tip.style.color = "#16a34a";
+            } else {
+                tip.innerText = data.message || "生成失败，请稍后重试";
+                tip.style.color = "#dc2626";
+            }
+        } catch (e) {
+            console.error(e);
+            tip.innerText = "请求失败，请检查后端服务是否正常运行";
+            tip.style.color = "#dc2626";
+        }
+    }
+</script>
+</body>
+</html>

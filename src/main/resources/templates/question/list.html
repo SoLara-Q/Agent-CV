@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>面试题库</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="bg-decoration">
+    <div class="floating-icon">📄</div>
+    <div class="floating-icon">💼</div>
+    <div class="floating-icon">🎯</div>
+    <div class="floating-icon">✨</div>
+    <div class="floating-icon">🚀</div>
+</div>
+
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+    <div class="card">
+        <h3 class="card-title">面试题库</h3>
+
+        <div class="category-tabs">
+            <a th:classappend="${category == '' ? 'active' : ''}"
+               th:href="@{/questions(keyword=${keyword},jobType=${jobType},difficulty=${difficulty})}">全部</a>
+            <a th:each="c : ${categories}"
+               th:text="${c}"
+               th:classappend="${category == c ? 'active' : ''}"
+               th:href="@{/questions(category=${c},keyword=${keyword},jobType=${jobType},difficulty=${difficulty})}"></a>
+        </div>
+
+        <form class="toolbar" th:action="@{/questions}" method="get">
+            <input type="hidden" name="category" th:value="${category}">
+            <input style="max-width:280px;" name="keyword" th:value="${keyword}" placeholder="搜索题目 / 答案 / 标签">
+            <select style="max-width:180px;" name="jobType">
+                <option value="">全部岗位</option>
+                <option th:each="j : ${jobTypes}" th:value="${j}" th:text="${j}" th:selected="${jobType == j}"></option>
+            </select>
+            <select style="max-width:160px;" name="difficulty">
+                <option value="">全部难度</option>
+                <option th:each="d : ${difficulties}" th:value="${d}" th:text="${d}" th:selected="${difficulty == d}"></option>
+            </select>
+            <button class="btn" type="submit">查询</button>
+            <a class="btn gray" th:href="@{/questions}">重置</a>
+            <a sec:authorize="hasRole('ADMIN')" class="btn green" th:href="@{/questions/form}">新增题目</a>
+        </form>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>分类</th>
+                <th>岗位</th>
+                <th>题目</th>
+                <th>难度</th>
+                <th>标签</th>
+                <th>浏览</th>
+                <th>答案</th>
+                <th sec:authorize="hasRole('ADMIN')">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="q : ${page.records}">
+                <td th:text="${q.id}"></td>
+                <td><span class="badge blue" th:text="${q.category}"></span></td>
+                <td th:text="${q.jobType}"></td>
+                <td class="question-title" th:text="${q.title}"></td>
+                <td><span class="badge" th:text="${q.difficulty}"></span></td>
+                <td class="tag-cell" th:text="${q.tags}"></td>
+                <td th:text="${q.viewCount ?: 0}"></td>
+                <td><a class="btn small green" th:href="@{/questions/view/{id}(id=${q.id})}">查看答案</a></td>
+                <td sec:authorize="hasRole('ADMIN')">
+                    <a class="btn small" th:href="@{/questions/form(id=${q.id})}">编辑</a>
+                    <a class="btn small danger" th:href="@{/questions/delete/{id}(id=${q.id})}" onclick="return confirm('确认删除？')">删除</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(page.records)}">
+                <td colspan="9" style="text-align:center;color:#64748b;padding:30px;">暂无匹配题目</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <a class="btn small gray" th:if="${page.current > 1}" th:href="@{/questions(page=${page.current-1},keyword=${keyword},category=${category},jobType=${jobType},difficulty=${difficulty})}">上一页</a>
+            <span>第 <b th:text="${page.current}"></b> / <b th:text="${page.pages == 0 ? 1 : page.pages}"></b> 页，共 <b th:text="${page.total}"></b> 条</span>
+            <a class="btn small gray" th:if="${page.current < page.pages}" th:href="@{/questions(page=${page.current+1},keyword=${keyword},category=${category},jobType=${jobType},difficulty=${difficulty})}">下一页</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">高频题目缓存展示</h3>
+        <p class="tip">根据浏览次数排序，优先从 Redis 读取；Redis 不可用时自动降级。</p>
+        <ul class="hot-list">
+            <li th:each="q : ${hotQuestions}">
+                <span class="badge blue" th:text="${q.category}"></span>
+                <a th:text="${q.title}" th:href="@{/questions/view/{id}(id=${q.id})}"></a>
+                <span class="muted" th:text="${'浏览 ' + (q.viewCount ?: 0)}"></span>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

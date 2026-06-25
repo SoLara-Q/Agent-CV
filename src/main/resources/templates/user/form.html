@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户表单</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+    <div class="card">
+        <h3 class="card-title" th:text="${user.id == null ? '新增用户' : '编辑用户'}"></h3>
+        <form th:action="@{/users/save}" method="post" th:object="${user}">
+            <input type="hidden" th:field="*{id}">
+            <div class="form-row">
+                <label>用户名</label>
+                <input th:field="*{username}" required>
+            </div>
+            <div class="form-row">
+                <label>昵称</label>
+                <input th:field="*{nickname}">
+            </div>
+            <div class="form-row">
+                <label>密码</label>
+                <input name="rawPassword" type="password" placeholder="新增默认 123456；编辑时留空表示不修改密码">
+            </div>
+            <div class="form-row">
+                <label>角色</label>
+                <select th:field="*{role}">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label>状态</label>
+                <select th:field="*{enabled}">
+                    <option value="1">启用</option>
+                    <option value="0">禁用</option>
+                </select>
+            </div>
+            <button class="btn" type="submit">保存</button>
+            <a class="btn gray" th:href="@{/users}">返回</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

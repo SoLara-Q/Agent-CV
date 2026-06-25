@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>简历优化</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+    <div class="card">
+        <h3 class="card-title">简历优化管理</h3>
+        <form class="toolbar" th:action="@{/resumes}" method="get">
+            <input style="max-width:280px;" name="keyword" th:value="${keyword}" placeholder="姓名/目标岗位">
+            <button class="btn" type="submit">查询</button>
+            <a class="btn gray" th:href="@{/resumes}">重置</a>
+            <a class="btn green" th:href="@{/resumes/form}">新增简历</a>
+        </form>
+
+        <table>
+            <thead>
+            <tr><th>ID</th><th>姓名</th><th>目标岗位</th><th>核心技能</th><th>简历文件</th><th>AI建议</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${page.records}">
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.realName}"></td>
+                <td th:text="${r.targetJob}"></td>
+                <td th:text="${#strings.abbreviate(r.skills, 50)}"></td>
+                <td>
+                    <a th:if="${r.filePath != null}" th:href="${r.filePath}" target="_blank">查看docx</a>
+                    <span th:if="${r.filePath == null}">未上传</span>
+                </td>
+                <td th:text="${r.aiSuggest == null ? '未分析' : #strings.abbreviate(r.aiSuggest, 60)}"></td>
+                <td>
+                    <a class="btn small" th:href="@{/resumes/form(id=${r.id})}">查看/编辑</a>
+                    <a class="btn small green" th:href="@{/resumes/analyze/{id}(id=${r.id})}">AI分析</a>
+                    <a class="btn small danger" th:href="@{/resumes/delete/{id}(id=${r.id})}" onclick="return confirm('确认删除？')">删除</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <a class="btn small gray" th:if="${page.current > 1}" th:href="@{/resumes(page=${page.current-1},keyword=${keyword})}">上一页</a>
+            <span>第 <b th:text="${page.current}"></b> / <b th:text="${page.pages}"></b> 页，共 <b th:text="${page.total}"></b> 条</span>
+            <a class="btn small gray" th:if="${page.current < page.pages}" th:href="@{/resumes(page=${page.current+1},keyword=${keyword})}">下一页</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

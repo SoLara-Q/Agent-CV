@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>数据看板</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+<div class="bg-decoration">
+    <div class="floating-icon">📄</div>
+    <div class="floating-icon">💼</div>
+    <div class="floating-icon">🎯</div>
+    <div class="floating-icon">✨</div>
+    <div class="floating-icon">🚀</div>
+</div>
+
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+    <div class="grid">
+        <div class="stat"><div class="num" th:text="${questionCount}">0</div><div class="label">面试题总数</div></div>
+        <div class="stat"><div class="num" th:text="${resumeCount}">0</div><div class="label">简历记录总数</div></div>
+        <div class="stat"><div class="num" th:text="${userCount}">0</div><div class="label">用户总数</div></div>
+    </div>
+    <div class="card">
+        <h3 class="card-title">岗位题库分布图</h3>
+        <p class="tip">该模块使用 Echarts 展示不同岗位方向的题目数量。</p>
+        <div id="jobChart" style="height:420px;"></div>
+    </div>
+    <div class="card">
+        <h3 class="card-title">分类题库分布图</h3>
+        <p class="tip">展示 Java、MySQL、Redis、软件测试、项目面试等分类题量。</p>
+        <div id="categoryChart" style="height:420px;"></div>
+    </div>
+</div>
+<script>
+    function renderBar(api, elementId, title) {
+        fetch(api)
+            .then(resp => resp.json())
+            .then(data => {
+                const el = document.getElementById(elementId);
+                if (!window.echarts) {
+                    el.innerHTML = 'Echarts CDN 加载失败，但统计接口已正常返回：' + JSON.stringify(data);
+                    return;
+                }
+                const chart = echarts.init(el);
+                chart.setOption({
+                    title: { text: title },
+                    tooltip: {},
+                    xAxis: { type: 'category', data: data.names, axisLabel: { rotate: 20 } },
+                    yAxis: { type: 'value' },
+                    series: [{ name: '题目数量', type: 'bar', data: data.values }]
+                });
+            })
+            .catch(err => {
+                document.getElementById(elementId).innerHTML = '统计数据加载失败：' + err;
+            });
+    }
+    renderBar('/api/stats/job-types', 'jobChart', '岗位题库分布');
+    renderBar('/api/stats/categories', 'categoryChart', '分类题库分布');
+</script>
+</body>
+</html>

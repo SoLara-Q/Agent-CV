@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页 - AI 面试平台</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container">
+    <div class="hero">
+        <h1>AI 面试刷题与简历优化平台</h1>
+        <p>
+            面向大学生实习求职场景，系统提供多岗位面试题库、简历 DOCX 上传解析、AI 模拟优化建议、
+            Redis 高频题缓存、Echarts 数据看板与用户权限控制。
+        </p>
+    </div>
+
+    <div class="grid four">
+        <div class="stat">
+            <div class="num" th:text="${questionCount ?: 0}">0</div>
+            <div class="label">面试题总数</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${testQuestionCount ?: 0}">0</div>
+            <div class="label">软件测试题目</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${resumeCount ?: 0}">0</div>
+            <div class="label">简历分析数量</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${userCount ?: 0}">0</div>
+            <div class="label">系统用户数量</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">项目技术亮点</h3>
+        <p>
+            本系统基于 Spring Boot 构建，后端采用 Spring Security 实现登录认证与角色权限控制，
+            使用 MyBatis-Plus 完成题库分页、多条件筛选和数据持久化，前端使用 Thymeleaf 实现动态页面渲染。
+        </p>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">高频面试题 Redis 缓存</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>分类</th>
+                <th>岗位方向</th>
+                <th>题目内容</th>
+                <th>难度</th>
+                <th>浏览次数</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="q : ${hotQuestions}">
+                <td><span class="badge blue" th:text="${q.category}"></span></td>
+                <td th:text="${q.jobType}"></td>
+                <td><a th:text="${q.title}" th:href="@{/questions/view/{id}(id=${q.id})}"></a></td>
+                <td><span class="badge" th:text="${q.difficulty}"></span></td>
+                <td th:text="${q.viewCount ?: 0}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

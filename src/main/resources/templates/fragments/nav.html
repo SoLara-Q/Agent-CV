@@ -1,0 +1,14 @@
+<div class="nav" th:fragment="nav" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <a class="brand" th:href="@{/}">AI 面试平台</a>
+
+    <a th:href="@{/}">首页</a>
+    <a th:href="@{/questions}">面试题库</a>
+    <a th:href="@{/resumes}">简历优化</a>
+    <a th:href="@{/stats}">数据看板</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}">用户管理</a>
+
+    <div class="right">
+        <span>当前用户：<b sec:authentication="name"></b></span>
+        <a th:href="@{/logout}">退出登录</a>
+    </div>
+</div>

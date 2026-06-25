@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>查看答案</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div class="container">
+    <div class="card question-detail">
+        <div class="detail-meta">
+            <span class="badge blue" th:text="${question.category}"></span>
+            <span class="badge" th:text="${question.difficulty}"></span>
+            <span class="muted" th:text="${question.jobType}"></span>
+            <span class="muted" th:text="${'浏览 ' + (question.viewCount ?: 0)}"></span>
+        </div>
+        <h2 th:text="${question.title}">题目标题</h2>
+        <div class="answer-box">
+            <h3>参考答案</h3>
+            <p th:text="${question.answer}">答案内容</p>
+        </div>
+        <p class="tip">标签：<span th:text="${question.tags}"></span></p>
+        <a class="btn gray" th:href="@{/questions}">返回题库</a>
+        <a sec:authorize="hasRole('ADMIN')" class="btn" th:href="@{/questions/form(id=${question.id})}">编辑题目</a>
+    </div>
+</div>
+</body>
+</html>

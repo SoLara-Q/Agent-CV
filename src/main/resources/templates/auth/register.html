@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>注册 - AI 面试平台</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="login-page">
+
+<div class="bg-decoration">
+    <div class="floating-icon">📄</div>
+    <div class="floating-icon">💼</div>
+    <div class="floating-icon">🎯</div>
+    <div class="floating-icon">✨</div>
+    <div class="floating-icon">🚀</div>
+</div>
+
+<div class="login-container register-container">
+  <div class="login-left">
+    <div class="logo-box">AI</div>
+    <h1>创建你的学习账号</h1>
+    <p>
+      注册后可以使用面试题库、简历 DOCX 上传解析、AI 简历优化建议和个人学习数据管理功能。
+    </p>
+
+    <div class="feature-list">
+      <div>✓ 普通用户自动分配 USER 角色</div>
+      <div>✓ 密码使用 BCrypt 加密保存</div>
+      <div>✓ 支持后续简历分析与刷题记录</div>
+      <div>✓ 管理员可在用户管理中维护账号</div>
+    </div>
+  </div>
+
+  <div class="login-card simple">
+    <h2>用户注册</h2>
+    <p class="login-subtitle">填写账号信息后即可登录系统</p>
+
+    <div class="alert error" th:if="${param.error != null and param.error[0] == 'empty'}">
+      用户名和密码不能为空
+    </div>
+
+    <div class="alert error" th:if="${param.error != null and param.error[0] == 'confirm'}">
+      两次输入的密码不一致
+    </div>
+
+    <div class="alert error" th:if="${param.error != null and param.error[0] == 'exists'}">
+      用户名已存在，请更换用户名
+    </div>
+
+    <form th:action="@{/register}" method="post">
+      <div class="login-form-item">
+        <label>用户名</label>
+        <input type="text" name="username" placeholder="请输入用户名" required>
+      </div>
+
+      <div class="login-form-item">
+        <label>昵称</label>
+        <input type="text" name="nickname" placeholder="请输入昵称，可不填">
+      </div>
+
+      <div class="login-form-item">
+        <label>密码</label>
+        <input type="password" name="password" placeholder="请输入密码" required>
+      </div>
+
+      <div class="login-form-item">
+        <label>确认密码</label>
+        <input type="password" name="confirmPassword" placeholder="请再次输入密码" required>
+      </div>
+
+      <button class="login-btn" type="submit">立即注册</button>
+    </form>
+
+    <div class="account-tip center-tip">
+      已有账号？
+      <a th:href="@{/login}">返回登录</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

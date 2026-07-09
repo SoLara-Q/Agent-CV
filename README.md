@@ -117,4 +117,3 @@ docker exec -it ai-interview-redis redis-cli ping
 
 MySQL 初始化脚本：`src/main/resources/db/mysql.sql`
 
-如果已有旧库，建议先备份数据，再执行 `mysql.sql` 重建表结构。

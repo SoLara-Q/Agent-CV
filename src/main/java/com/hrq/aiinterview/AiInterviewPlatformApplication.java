@@ -10,4 +10,7 @@ public class AiInterviewPlatformApplication {
     public static void main(String[] args) {
         SpringApplication.run(AiInterviewPlatformApplication.class, args);
     }
+
+
+
 }
